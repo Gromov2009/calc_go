@@ -58,6 +58,19 @@ curl --location 'localhost:8080/api/v1/calculate' \
 '{ "result": "6.000000" }'
 ```
 
+Пример ошибочного запроса:
+```bash
+curl --location 'localhost:8080/api/v1/calculate' \
+--header 'Content-Type: application/json' \
+--data '{
+  "expression": "2+(2*2"
+}'
+```
+Вернет:
+```bash
+'{ "error": "Expression is not valid" }'
+```
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Технологии
