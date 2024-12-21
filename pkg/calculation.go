@@ -1,6 +1,8 @@
 package calculation
 
 import (
+	"fmt"
+	"regexp"
 	"strconv"
 	"unicode"
 )
@@ -15,8 +17,17 @@ func Calc(exp string) (float64, error) {
 	if exp == "" {
 		return 0.0, ErrInvalidExpression //errors.New("empty body")
 	}
-	res := plusMinus(exp)
-	return res.result, res.err
+
+	re, _ := regexp.Compile(`[a-zA-Z]+`)
+	res := re.FindAllString(exp, -1)
+
+	if len(res) != 0 {
+		fmt.Println("exp contains bad symbols")
+		return 0.0, ErrInvalidExpression //errors.New("empty body")
+	}
+
+	result := plusMinus(exp)
+	return result.result, result.err
 }
 
 func Bracket(exp string) Result {

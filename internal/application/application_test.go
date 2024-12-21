@@ -13,7 +13,7 @@ import (
 )
 
 func TestRequestHandlerSuccessSimpleCase(t *testing.T) {
-	expected := "result: 11.000000"
+	expected := `{ "result": "11.000000" }`
 	bodyReader := strings.NewReader(`{"expression": "5+6"}`)
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculate", bodyReader)
 
@@ -38,7 +38,7 @@ func TestRequestHandlerSuccessSimpleCase(t *testing.T) {
 }
 
 func TestRequestHandlerSuccessCase(t *testing.T) {
-	expected := "result: -52.000000"
+	expected := `{ "result": "-52.000000" }`
 	bodyReader := strings.NewReader(`{"expression": "33/11-5*(5+6)"}`)
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculate", bodyReader)
 
@@ -69,7 +69,8 @@ func TestRequestHandlerEmptyBodyCase(t *testing.T) {
 	w := httptest.NewRecorder()
 	application.CalcHandler(w, req)
 	res := w.Result()
-	if res.StatusCode != http.StatusBadRequest {
+
+	if res.StatusCode != http.StatusUnprocessableEntity {
 		t.Fatalf("request is invalid but Status %s was obtained", res.Status)
 	}
 
@@ -85,7 +86,23 @@ func TestRequestHandlerBadRequestCase(t *testing.T) {
 
 	res := w.Result()
 	fmt.Println(res)
-	if res.StatusCode != http.StatusBadRequest {
+	if res.StatusCode != http.StatusUnprocessableEntity {
+		t.Fatalf("request is invalid but Status %s was obtained", res.Status)
+	}
+
+}
+
+func TestRequestHandlerBadSymbolsCase(t *testing.T) {
+
+	bodyReader := strings.NewReader(`{"expression": "3*(5+qwer6)"}`)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculate", bodyReader)
+
+	w := httptest.NewRecorder()
+	application.CalcHandler(w, req)
+
+	res := w.Result()
+	fmt.Println(res)
+	if res.StatusCode != http.StatusUnprocessableEntity {
 		t.Fatalf("request is invalid but Status %s was obtained", res.Status)
 	}
 
@@ -101,7 +118,7 @@ func TestRequestHandlerDivByErrorCase(t *testing.T) {
 	application.CalcHandler(w, req)
 
 	res := w.Result()
-	if res.StatusCode != http.StatusBadRequest {
+	if res.StatusCode != http.StatusUnprocessableEntity {
 		t.Fatalf("request is invalid but Status %s was obtained", res.Status)
 	}
 

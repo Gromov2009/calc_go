@@ -48,8 +48,8 @@ func CalcHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		fmt.Println("error:", err.Error())
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		//fmt.Println("error:", err.Error())
+		http.Error(w, `{ "error": "Expression is not valid" }`, http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -57,12 +57,12 @@ func CalcHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		//fmt.Fprintf(w, "err: %s", err.Error())
 		if errors.Is(err, calculation.ErrInvalidExpression) || errors.Is(err, calculation.ErrMissingClosingBracket) || errors.Is(err, calculation.ErrDivByZero) {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, `{ "error": "Expression is not valid" }`, http.StatusUnprocessableEntity)
 		} else {
-			http.Error(w, "unknown error", http.StatusNotImplemented)
+			http.Error(w, `{ "error": "unknown error" }`, http.StatusNotImplemented)
 		}
 	} else {
-		fmt.Fprintf(w, "result: %f", result)
+		fmt.Fprintf(w, `{ "result": "%f" }`, result)
 	}
 
 }
